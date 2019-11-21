@@ -104,7 +104,6 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
                 ex.printStackTrace();
             }
         } else if (id == 2) try {
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                 res = "Lock Screen Set Successfully";
