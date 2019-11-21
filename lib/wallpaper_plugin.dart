@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 class WallpaperPlugin {
   static const MethodChannel _channel = const MethodChannel('wallpaper_plugin');
 
-  static Future<bool> setHomeScreenWallpaper(String path) async {
+  static Future<String> setHomeScreenWallpaper(String path) async {
     final Map<String, dynamic> params = <String, dynamic>{'path': path};
-    final bool isSuccess = await _channel.invokeMethod('HomeScreen', params);
+    final String isSuccess = await _channel.invokeMethod('HomeScreen', params);
     return isSuccess;
   }
 
