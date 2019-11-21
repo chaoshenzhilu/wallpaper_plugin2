@@ -91,23 +91,18 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
         // set bitmap to wallpaper
         Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
         if (id == 1) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
-                            res = "Home Screen Set Successfully";
-                        } else {
-                            res = "To Set Home Screen Requires Api Level 24";
-                        }
-
-
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
+                    res = "Home Screen Set Successfully";
+                } else {
+                    res = "To Set Home Screen Requires Api Level 24";
                 }
-            }).start();
+
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } else if (id == 2) try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
