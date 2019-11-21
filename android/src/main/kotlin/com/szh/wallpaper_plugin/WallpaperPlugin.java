@@ -31,7 +31,7 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
     private int id;
     private static String res = "";
 
-    public WallpaperPlugin(Activity activity) {
+    private WallpaperPlugin(Activity activity) {
         this.activity = activity;
     }
 
@@ -47,7 +47,7 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
                 Log.e(Tag, "resultcode=" + responseCode + "requestcode=" + requestCode);
                 if (responseCode == Activity.RESULT_OK) {
                     res = "System Screen Set Successfully";
-                } else if (responseCode ==  Activity.RESULT_CANCELED) {
+                } else if (responseCode == Activity.RESULT_CANCELED) {
                     res = "setting Wallpaper Cancelled";
                 } else {
                     res = "Something Went Wrong";
@@ -59,18 +59,19 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
 
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+        String path = call.argument("path").toString();
         switch (call.method) {
             case "HomeScreen":
-                result.success(setWallpaper(1, (String) call.arguments));
+                result.success(setWallpaper(1, path));
                 break;
             case "LockScreen":
-                result.success(setWallpaper(2, (String) call.arguments));
+                result.success(setWallpaper(2, path));
                 break;
             case "Both":
-                result.success(setWallpaper(3, (String) call.arguments));
+                result.success(setWallpaper(3, path));
                 break;
             case "System":
-                result.success(setWallpaper(4,(String) call.arguments));
+                result.success(setWallpaper(4, path));
                 break;
             default:
                 result.notImplemented();
@@ -138,9 +139,7 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
 
                     Intent intent = new Intent(wallpaperManager.getCropAndSetWallpaperIntent(contentURI));
                     String mime = "image/*";
-                    if (intent != null) {
-                        intent.setDataAndType(contentURI, mime);
-                    }
+                    intent.setDataAndType(contentURI, mime);
                     try {
                         activity.startActivityForResult(intent, 2);
                     } catch (ActivityNotFoundException e) {
@@ -154,7 +153,7 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
         return res;
     }
 
-    public static Uri getImageContentUri(Context context, File imageFile) {
+    private static Uri getImageContentUri(Context context, File imageFile) {
         String filePath = imageFile.getAbsolutePath();
         Log.d("Tag", filePath);
         Cursor cursor = context.getContentResolver().query(
@@ -167,6 +166,7 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
             int id = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.MediaColumns._ID));
             Uri baseUri = Uri.parse("content://media/external/images/media");
+            cursor.close();
             return Uri.withAppendedPath(baseUri, "" + id);
         } else {
             if (imageFile.exists()) {
@@ -179,5 +179,4 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
             }
         }
     }
-
 }
