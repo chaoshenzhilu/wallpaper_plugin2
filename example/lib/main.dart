@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:wallpaper_plugin/wallpaper_plugin.dart';
 
 void main() => runApp(MyApp());
@@ -27,7 +24,7 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: MaterialButton(
             onPressed: () {
-              WallpaperPlugin.setWallpaper(
+              WallpaperPlugin.setHomeScreenWallpaper(
                   'Android/data/com.wallpaper.flutter_wallpaper/files/https:goss.veer.comcreativevcgveer800waterveer-147011245.jpg');
             },
             child: Text('设置壁纸'),

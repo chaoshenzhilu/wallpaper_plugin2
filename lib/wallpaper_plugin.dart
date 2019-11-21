@@ -10,16 +10,19 @@ class WallpaperPlugin {
     final bool isSuccess = await _channel.invokeMethod('HomeScreen', params);
     return isSuccess;
   }
+
   static Future<bool> setLockScreenWallpaper(String path) async {
     final Map<String, dynamic> params = <String, dynamic>{'path': path};
     final bool isSuccess = await _channel.invokeMethod('LockScreen', params);
     return isSuccess;
   }
+
   static Future<bool> setBothWallpaper(String path) async {
     final Map<String, dynamic> params = <String, dynamic>{'path': path};
     final bool isSuccess = await _channel.invokeMethod('Both', params);
     return isSuccess;
   }
+
   static Future<bool> setSystemWallpaper(String path) async {
     final Map<String, dynamic> params = <String, dynamic>{'path': path};
     final bool isSuccess = await _channel.invokeMethod('System', params);
