@@ -47,21 +47,21 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
         registrar.addActivityResultListener(new PluginRegistry.ActivityResultListener() {
             @Override
             public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-                if (requestCode == REQUEST_CODE_SET_WALLPAPER) {
-                    if (resultCode == Activity.RESULT_OK) {
-                        // TODO: 2017/3/13 设置动态壁纸成功
-                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // TODO: 2017/3/13 取消设置动态壁纸
-                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
-                    }
-                } else if (requestCode == REQUEST_CODE_SELECT_SYSTEM_WALLPAPER) {
-                    if (resultCode == Activity.RESULT_OK) {
-                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
-                    }
-                }
+//                if (requestCode == REQUEST_CODE_SET_WALLPAPER) {
+//                    if (resultCode == Activity.RESULT_OK) {
+//                        // TODO: 2017/3/13 设置动态壁纸成功
+//                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        // TODO: 2017/3/13 取消设置动态壁纸
+//                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
+//                    }
+//                } else if (requestCode == REQUEST_CODE_SELECT_SYSTEM_WALLPAPER) {
+//                    if (resultCode == Activity.RESULT_OK) {
+//                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
                 return false;
             }
         });
