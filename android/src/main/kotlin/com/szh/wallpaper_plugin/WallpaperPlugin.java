@@ -17,19 +17,22 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
+    private final static int REQUEST_CODE_SET_WALLPAPER = 0x001;
+    private final static int REQUEST_CODE_SELECT_SYSTEM_WALLPAPER = 0x002;
     private static String Tag = "WallpaperPlugin";
     private Activity activity;
     private int id;
     private static String res = "";
+    MethodChannel.Result result;
 
     private WallpaperPlugin(Activity activity) {
         this.activity = activity;
@@ -43,14 +46,21 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
         channel.setMethodCallHandler(new WallpaperPlugin(registrar.activity()));
         registrar.addActivityResultListener(new PluginRegistry.ActivityResultListener() {
             @Override
-            public boolean onActivityResult(int requestCode, int responseCode, Intent intent) {
-                Log.e(Tag, "resultcode=" + responseCode + "requestcode=" + requestCode);
-                if (responseCode == Activity.RESULT_OK) {
-                    res = "System Screen Set Successfully";
-                } else if (responseCode == Activity.RESULT_CANCELED) {
-                    res = "setting Wallpaper Cancelled";
-                } else {
-                    res = "Something Went Wrong";
+            public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
+                if (requestCode == REQUEST_CODE_SET_WALLPAPER) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        // TODO: 2017/3/13 设置动态壁纸成功
+                        Toast.makeText(registrar.activity(), "设置动态壁纸成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // TODO: 2017/3/13 取消设置动态壁纸
+                        Toast.makeText(registrar.activity(), "取消设置动态壁纸", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (requestCode == REQUEST_CODE_SELECT_SYSTEM_WALLPAPER) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        Toast.makeText(registrar.activity(), "设置系统壁纸成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(registrar.activity(), "取消设置系统壁纸", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 return false;
             }
@@ -59,22 +69,14 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
 
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+        this.result = result;
         String path = call.argument("path").toString();
         switch (call.method) {
-            case "HomeScreen":
-                result.success(setWallpaper(1, path));
-                break;
-            case "LockScreen":
-                result.success(setWallpaper(2, path));
-                break;
-            case "Both":
-                result.success(setWallpaper(3, path));
-                break;
             case "System":
-                result.success(setWallpaper(4, path));
+                setWallpaper(path, REQUEST_CODE_SELECT_SYSTEM_WALLPAPER);
                 break;
             case "Video":
-                LiveWallpaperService.startWallPaper(activity,path);
+                LiveWallpaperService.startWallPaper(activity, path);
                 break;
             default:
                 result.notImplemented();
@@ -84,75 +86,34 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
 
     @TargetApi(Build.VERSION_CODES.FROYO)
     @SuppressLint("MissingPermission")
-    private String setWallpaper(int i, String path) {
-        id = i;
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
-
-        File file = new File(activity.getExternalFilesDir(null), path);
-        //File file = new File(Activity.ge);
-        //Activity.getDir("flutter", 0).getPath()
-        // set bitmap to wallpaper
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-        if (id == 1) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
-                    res = "Home Screen Set Successfully";
-                } else {
-                    res = "To Set Home Screen Requires Api Level 24";
-                }
-
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else if (id == 2) try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                res = "Lock Screen Set Successfully";
+    private void setWallpaper(String path, int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (activity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED &&
+                    activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             } else {
-                res = "To Set Lock Screen Requires Api Level 24";
-            }
-
-
-        } catch (IOException e) {
-            res = e.toString();
-            e.printStackTrace();
-        }
-        else if (id == 3) {
-            try {
-                wallpaperManager.setBitmap(bitmap);
-                res = "Home And Lock Screen Set Successfully";
-            } catch (IOException e) {
-                res = e.toString();
-                e.printStackTrace();
-            }
-
-        } else if (id == 4) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (activity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED &&
-                        activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                != PackageManager.PERMISSION_GRANTED) {
-                    activity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                } else {
-                    Uri uri = Uri.fromFile(file);
-                    Uri contentURI = getImageContentUri(activity, file);
-
-                    Intent intent = new Intent(wallpaperManager.getCropAndSetWallpaperIntent(contentURI));
-                    String mime = "image/*";
-                    intent.setDataAndType(contentURI, mime);
-                    try {
-                        activity.startActivityForResult(intent, 2);
-                    } catch (ActivityNotFoundException e) {
-                        //handle error
-                        res = "Error To Set Wallpaer";
-                    }
+                File file = new File(path);
+                Uri contentURI = getImageContentUri(activity, file);
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
+                Intent intent = new Intent(wallpaperManager.getCropAndSetWallpaperIntent(contentURI));
+                String mime = "image/*";
+                intent.setDataAndType(contentURI, mime);
+                try {
+                    activity.startActivityForResult(intent, requestCode);
+                } catch (ActivityNotFoundException e) {
                 }
             }
+        } else {
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            boolean isSuccess = WallpaperUtil.onSetWallpaperForBitmap(activity, bitmap);
+            if (isSuccess) {
+                Toast.makeText(activity, "设置壁纸成功", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(activity, "设置壁纸失败", Toast.LENGTH_SHORT).show();
+            }
         }
-
-        return res;
     }
 
     private static Uri getImageContentUri(Context context, File imageFile) {

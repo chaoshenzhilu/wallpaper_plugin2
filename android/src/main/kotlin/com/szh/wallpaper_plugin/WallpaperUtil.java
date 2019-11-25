@@ -4,12 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
+
+import java.io.IOException;
 
 
 /**
@@ -17,23 +16,59 @@ import android.os.Build;
  */
 public class WallpaperUtil {
 
+
     /**
-     * 跳转到系统设置壁纸界面
-     *
-     * @param context
-     * @param paramActivity
+     * 使用资源文件设置壁纸
+     * 直接设置为壁纸，不会有任何界面和弹窗出现
      */
-    public static void setLiveWallpaper(Context context, Activity paramActivity, int requestCode) {
+    @SuppressLint({"MissingPermission", "NewApi"})
+    public static void onSetWallpaperForResource(Activity activity, int raw) {
+//        WallpaperManager manager =(WallpaperManager)getSystemService(WALLPAPER_SERVICE);
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
         try {
-            Intent localIntent = new Intent();
-            localIntent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);//android.service.wallpaper.CHANGE_LIVE_WALLPAPER
-            //android.service.wallpaper.extra.LIVE_WALLPAPER_COMPONENT
-            localIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT
-                    , new ComponentName(context.getApplicationContext().getPackageName()
-                            , LiveWallpaperService.class.getCanonicalName()));
-            paramActivity.startActivityForResult(localIntent, requestCode);
-        } catch (Exception localException) {
-            localException.printStackTrace();
+            wallpaperManager.setResource(raw);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+////                WallpaperManager.FLAG_LOCK WallpaperManager.FLAG_SYSTEM
+////                wallpaperManager.setResource(R.raw.wallpaper, WallpaperManager.FLAG_SYSTEM);
+////            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 使用Bitmap设置壁纸
+     * 直接设置为壁纸，不会有任何界面和弹窗出现
+     * 壁纸切换，会有动态的渐变切换
+     */
+    @SuppressLint({"MissingPermission", "NewApi"})
+    public static boolean onSetWallpaperForBitmap(Activity activity, Bitmap bitmap) {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
+        try {
+            wallpaperManager.setBitmap(bitmap);
+            // 已过时的Api
+//            setWallpaper(wallpaperBitmap);
+//            setWallpaper(getResources().openRawResource(R.raw.girl));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 清除壁纸
+     */
+    @SuppressLint({"MissingPermission", "NewApi"})
+    public static void clearWallpaper(Activity activity) {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(activity);
+        try {
+            wallpaperManager.clear();
+
+            // 已过时的Api
+//            clearWallpaper();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
