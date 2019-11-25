@@ -28,4 +28,10 @@ class WallpaperPlugin {
     final String isSuccess = await _channel.invokeMethod('System', params);
     return isSuccess;
   }
+
+  static Future<String> setVideoWallpaper(String path) async {
+    final Map<String, dynamic> params = <String, dynamic>{'path': path};
+    final String isSuccess = await _channel.invokeMethod('Video', params);
+    return isSuccess;
+  }
 }

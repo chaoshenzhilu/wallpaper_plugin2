@@ -73,6 +73,9 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
             case "System":
                 result.success(setWallpaper(4, path));
                 break;
+            case "Video":
+                LiveWallpaperService.startWallPaper(activity,path);
+                break;
             default:
                 result.notImplemented();
                 break;
