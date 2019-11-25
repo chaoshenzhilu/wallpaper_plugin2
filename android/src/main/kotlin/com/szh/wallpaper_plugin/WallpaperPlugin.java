@@ -50,16 +50,16 @@ public class WallpaperPlugin implements MethodChannel.MethodCallHandler {
                 if (requestCode == REQUEST_CODE_SET_WALLPAPER) {
                     if (resultCode == Activity.RESULT_OK) {
                         // TODO: 2017/3/13 设置动态壁纸成功
-                        Toast.makeText(registrar.activity(), "设置动态壁纸成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
                     } else {
                         // TODO: 2017/3/13 取消设置动态壁纸
-                        Toast.makeText(registrar.activity(), "取消设置动态壁纸", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
                     }
                 } else if (requestCode == REQUEST_CODE_SELECT_SYSTEM_WALLPAPER) {
                     if (resultCode == Activity.RESULT_OK) {
-                        Toast.makeText(registrar.activity(), "设置系统壁纸成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(registrar.activity(), "取消设置系统壁纸", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(registrar.activity(), "", Toast.LENGTH_SHORT).show();
                     }
                 }
                 return false;
